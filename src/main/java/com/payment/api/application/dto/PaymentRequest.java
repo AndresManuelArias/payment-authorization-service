@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive; // <--- Corregido aquí (sin la 'e')
+import jakarta.validation.constraints.Positive; 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor // <--- Corregido aquí (sin la 'e')
+@AllArgsConstructor 
 public class PaymentRequest {
 
     @NotBlank(message = "El transactionId es obligatorio")
