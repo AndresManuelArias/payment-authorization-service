@@ -1,3 +1,4 @@
+version java 17
 ## Run proyect
 
 ```sh
@@ -25,4 +26,11 @@ curl -X POST http://localhost:8080/api/payments/authorize \
     "paymentMethod": "CARD"
   }'
 
-``
+``` 
+
+## Test proyect
+
+```sh
+./mvnw test
+```
+
