@@ -18,10 +18,11 @@ public class MockFraudAdapter implements FraudDetectorPort {
     private static final Logger log = LoggerFactory.getLogger(MockFraudAdapter.class);
 
     @Override
+    @org.springframework.cache.annotation.Cacheable(value = "fraudCheckCache", key = "#payment.transactionId")
     @CircuitBreaker(name = "antiFraudProvider", fallbackMethod = "fallbackFraudCheck")
     @TimeLimiter(name = "antiFraudProvider")
     public String checkFraudRisk(Payment payment) {
-        log.info("[ADAPTER] Solicitando evaluación de fraude externa para transacción: {}", payment.getTransactionId());
+        log.info("[ADAPTER - CACHE MISS] Consultando proveedor externo real para transacción: {}", payment.getTransactionId());
         if (payment.getAmount().compareTo(new BigDecimal("999")) == 0) {
             return "HIGH_RISK";
         }
