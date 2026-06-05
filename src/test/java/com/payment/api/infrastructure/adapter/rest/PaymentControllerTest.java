@@ -110,8 +110,8 @@ class PaymentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(corruptRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.transactionId").exists())
-                .andExpect(jsonPath("$.amount").exists());
+                .andExpect(jsonPath("$.transactionId").value("El transactionId es obligatorio"))
+                .andExpect(jsonPath("$.amount").value("El monto debe ser mayor a cero"));
 
         verifyNoInteractions(processPaymentUseCase);
     }
