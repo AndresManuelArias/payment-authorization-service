@@ -58,15 +58,14 @@ public class ProcessPaymentUseCase {
         if ("HIGH_RISK".equalsIgnoreCase(fraudRisk)) {
             payment.reject("Payment rejected by anti-fraud system: HIGH_RISK detected");
         } else if ("LOW_RISK".equalsIgnoreCase(fraudRisk)) {
-
             String authCode = "AUTH-" + UUID.randomUUID().toString().substring(0, 6).toUpperCase();
             payment.approve(authCode);
             log.info("[USE CASE] Transacción {} APROBADA exitosamente con código: {}", payment.getTransactionId(), authCode);
+        } else if ("FALLBACK_REJECTED".equalsIgnoreCase(fraudRisk)) {
+            payment.reject("Payment rejected: Anti-fraud provider unavailable or timed out. Safe fallback applied.");
         } else {
-
-            payment.reject("Payment rejected: System fallback or unknown risk status applied");
+            payment.reject("Payment rejected: Unknown risk status applied");
         }
-
         return payment;
     }
 }
