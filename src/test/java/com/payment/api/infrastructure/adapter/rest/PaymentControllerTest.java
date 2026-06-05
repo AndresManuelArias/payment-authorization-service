@@ -72,6 +72,33 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("GET /api/payments/{transactionId} - Debería retornar HTTP 200 OK y los detalles de la transacción existente")
+    void getPaymentByIdFound() throws Exception {
+        PaymentRequest request = new PaymentRequest("TX-999", "CUST-1", new BigDecimal("1000"), "COP", "MER-1", "CARD");
+
+        Payment mockProcessedPayment = Payment.builder()
+                .transactionId("TX-999")
+                .status("APPROVED")
+                .authorizationCode("AUTH-123456")
+                .build();
+
+        when(processPaymentUseCase.execute(any(Payment.class))).thenReturn(mockProcessedPayment);
+
+        mockMvc.perform(post("/api/payments/authorize")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/payments/TX-999")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.transactionId").value("TX-999"))
+                .andExpect(jsonPath("$.status").value("APPROVED"))
+                .andExpect(jsonPath("$.authorizationCode").value("AUTH-123456"))
+                .andExpect(jsonPath("$.message").value("Payment authorized"));
+    }
+
+    @Test
     @DisplayName("GET /api/payments/{transactionId} - Debería retornar HTTP 404 si la transacción no existe")
     void getPaymentByIdNotFound() throws Exception {
         mockMvc.perform(get("/api/payments/TX-UNKNOWN")
