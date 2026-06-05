@@ -57,6 +57,29 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("POST /api/payments/authorize - Debería retornar HTTP 400 Bad Request cuando el pago es rechazado")
+    void authorizePaymentRejected() throws Exception {
+        PaymentRequest request = new PaymentRequest("TX-777", "CUST-2", new BigDecimal("50000"), "COP", "MER-1", "CARD");
+
+        Payment mockRejectedPayment = Payment.builder()
+                .transactionId("TX-777")
+                .status("REJECTED")
+                .rejectionReason("Exceeds maximum amount")
+                .build();
+
+        when(processPaymentUseCase.execute(any(Payment.class))).thenReturn(mockRejectedPayment);
+
+        mockMvc.perform(post("/api/payments/authorize")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.transactionId").value("TX-777"))
+                .andExpect(jsonPath("$.status").value("REJECTED"))
+                .andExpect(jsonPath("$.authorizationCode").doesNotExist())
+                .andExpect(jsonPath("$.message").value("Exceeds maximum amount"));
+    }
+
+    @Test
     @DisplayName("POST /api/payments/authorize - Debería retornar HTTP 400 Bad Request cuando faltan campos obligatorios")
     void authorizePaymentValidationError() throws Exception {
         PaymentRequest corruptRequest = new PaymentRequest("", "CUST-1", new BigDecimal("-50"), "COP", "MER-1", "CARD");
