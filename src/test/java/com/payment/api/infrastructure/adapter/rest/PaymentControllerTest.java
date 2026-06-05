@@ -80,6 +80,28 @@ class PaymentControllerTest {
     }
 
     @Test
+    @DisplayName("POST /api/payments/authorize - Debería retornar HTTP 400 Bad Request cuando el body está vacío")
+    void authorizePaymentEmptyBody() throws Exception {
+        mockMvc.perform(post("/api/payments/authorize")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(""))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(processPaymentUseCase);
+    }
+
+    @Test
+    @DisplayName("POST /api/payments/authorize - Debería retornar HTTP 400 Bad Request cuando el JSON es inválido")
+    void authorizePaymentMalformedJson() throws Exception {
+        mockMvc.perform(post("/api/payments/authorize")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{invalid}"))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(processPaymentUseCase);
+    }
+
+    @Test
     @DisplayName("POST /api/payments/authorize - Debería retornar HTTP 400 Bad Request cuando faltan campos obligatorios")
     void authorizePaymentValidationError() throws Exception {
         PaymentRequest corruptRequest = new PaymentRequest("", "CUST-1", new BigDecimal("-50"), "COP", "MER-1", "CARD");
